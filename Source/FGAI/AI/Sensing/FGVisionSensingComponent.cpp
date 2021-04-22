@@ -39,7 +39,7 @@ void UFGVisionSensingComponent::TickComponent(float DeltaTime, enum ELevelTick T
 			continue;
 		}
 
-		if (!IsPointVisible(Target->GetTargetOrigin(), Origin, Direction, SensingSettings->DistanceMinimum))
+		if (!IsPointVisible(Target->GetTargetOrigin(), Origin, Direction, SensingSettings->DistanceMinimum,GetOwner(), Target->GetOwner()))
 		{
 			FFGVisionSensingResults Results;
 			Results.SensedActor = Target->GetOwner();
@@ -55,8 +55,7 @@ void UFGVisionSensingComponent::TickComponent(float DeltaTime, enum ELevelTick T
 	for (UFGVisionSensingTargetComponent* Target : ListOfTargets)
 	{
 		if (!SensedTargets.Contains(Target) &&
-		IsPointVisible(Target->GetTargetOrigin(), Origin, Direction, SensingSettings->DistanceMinimum) &&
-        !BlockedByWall(GetOwner(), Target->GetOwner()) )
+		IsPointVisible(Target->GetTargetOrigin(), Origin, Direction, SensingSettings->DistanceMinimum, GetOwner(), Target->GetOwner()))
 		{
 			SensedTargets.Add(Target);
 			FFGVisionSensingResults Results;
@@ -66,7 +65,7 @@ void UFGVisionSensingComponent::TickComponent(float DeltaTime, enum ELevelTick T
 	}
 }
 
-bool UFGVisionSensingComponent::IsPointVisible(const FVector& PointToTest, const FVector& Origin, const FVector& Direction, float DistanceMinimum) const
+bool UFGVisionSensingComponent::IsPointVisible(const FVector& PointToTest, const FVector& Origin, const FVector& Direction, float DistanceMinimum, AActor* Senser, AActor* Sensed) const
 {
 	if (SensingSettings == nullptr)
 		return false;
@@ -77,6 +76,9 @@ bool UFGVisionSensingComponent::IsPointVisible(const FVector& PointToTest, const
 	{
 		return false;
 	}
+
+	if(BlockedByWall(Senser, Sensed))
+		return false;
 
 	const FVector DirectionToTarget = (PointToTest - Origin).GetSafeNormal();
 

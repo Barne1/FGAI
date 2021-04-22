@@ -27,7 +27,7 @@ public:
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	bool IsPointVisible(const FVector& PointToTest, const FVector& Origin, const FVector& Direction, float DistanceMinimum) const;
+	bool IsPointVisible(const FVector& PointToTest, const FVector& Origin, const FVector& Direction, float DistanceMinimum, AActor* Senser, AActor* Sensed) const;
 
 	UPROPERTY(Transient)
 	TArray<UFGVisionSensingTargetComponent*> SensedTargets;
