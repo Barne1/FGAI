@@ -55,7 +55,8 @@ void UFGVisionSensingComponent::TickComponent(float DeltaTime, enum ELevelTick T
 	for (UFGVisionSensingTargetComponent* Target : ListOfTargets)
 	{
 		if (!SensedTargets.Contains(Target) &&
-			IsPointVisible(Target->GetTargetOrigin(), Origin, Direction, SensingSettings->DistanceMinimum) )
+		IsPointVisible(Target->GetTargetOrigin(), Origin, Direction, SensingSettings->DistanceMinimum) &&
+        !BlockedByWall(GetOwner(), Target->GetOwner()) )
 		{
 			SensedTargets.Add(Target);
 			FFGVisionSensingResults Results;
@@ -95,3 +96,20 @@ float UFGVisionSensingComponent::GetVisionInRadians() const
 	return FMath::Cos(FMath::DegreesToRadians(SensingSettings->Angle));
 }
 
+bool UFGVisionSensingComponent::BlockedByWall(AActor* Senser, AActor* Sensed) const
+{
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(Senser);
+	ActorsToIgnore.Add(Sensed);
+
+	FHitResult Hit;
+	UKismetSystemLibrary::LineTraceSingle(this, Senser->GetActorLocation(), Sensed->GetActorLocation(), VisionTraceChannel, true, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
+
+	if(Hit.bBlockingHit)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Hit %s"), *Hit.GetActor()->GetName());
+		return true;
+	}
+
+	return false;
+}

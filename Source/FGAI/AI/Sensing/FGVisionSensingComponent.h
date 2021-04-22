@@ -46,5 +46,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = Debug)
 	bool bDebugDrawVision = false;
 
-	
+	UPROPERTY(EditDefaultsOnly)
+	TEnumAsByte<ETraceTypeQuery> VisionTraceChannel;
+
+protected:
+	bool BlockedByWall(AActor* Senser, AActor* Sensed) const;
 };
